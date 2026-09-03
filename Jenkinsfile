@@ -6,49 +6,64 @@ pipeline {
     }
 
     stages {
+
         stage("Checkout") {
             steps {
                 checkout scm
             }
         }
 
+        stage("Check Docker") {
+            steps {
+                sh 'docker --version'
+                sh 'docker compose version'
+            }
+        }
+
         stage("Build") {
             steps {
-                bat "docker compose build"
+                sh 'docker compose build'
             }
         }
 
         stage("Start Application") {
             steps {
-                bat "docker compose up -d"
+                sh 'docker compose up -d'
+            }
+        }
+
+        stage("Check Containers") {
+            steps {
+                sh 'docker compose ps'
             }
         }
 
         stage("Health Check") {
             steps {
-                bat "docker compose ps"
-                bat "curl.exe -f http://localhost:5000/health"
+                sh 'curl -f http://localhost:5000/health'
             }
         }
 
         stage("Smoke Test") {
             steps {
-                bat "curl.exe -f http://localhost:5000/"
+                sh 'curl -f http://localhost:5000/'
             }
         }
     }
 
     post {
         always {
-            bat "docker compose logs --no-color > docker-logs.txt"
-            archiveArtifacts artifacts: "docker-logs.txt", allowEmptyArchive: true
+            sh 'docker compose logs --no-color > docker-logs.txt || true'
+            archiveArtifacts artifacts: 'docker-logs.txt', allowEmptyArchive: true
         }
+
         success {
-            echo "College Event Registration application deployed successfully."
+            echo 'College Event Registration application deployed successfully.'
         }
+
         failure {
-            bat "docker compose ps"
-            echo "Deployment failed. Check the console log and docker-logs.txt."
+            sh 'docker compose ps || true'
+            echo 'Deployment failed. Check the console log and docker-logs.txt.'
         }
     }
 }
