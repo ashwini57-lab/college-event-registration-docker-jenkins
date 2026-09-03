@@ -2,7 +2,6 @@ services:
 
   mongo:
     image: mongo:7
-    container_name: college-event-mongo
     restart: unless-stopped
     ports:
       - "27017:27017"
@@ -17,7 +16,6 @@ services:
 
   web:
     build: .
-    container_name: college-event-web
     restart: unless-stopped
     ports:
       - "5000:5000"

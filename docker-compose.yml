@@ -1,7 +1,6 @@
 services:
   web:
     build: .
-    container_name: college-event-web
     ports:
       - "5000:5000"
     environment:
@@ -15,7 +14,6 @@ services:
 
   mongo:
     image: mongo:8
-    container_name: college-event-mongo
     ports:
       - "27017:27017"
     volumes:
